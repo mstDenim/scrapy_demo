@@ -19,6 +19,7 @@ class BookspiderSpider(scrapy.Spider):
 
     def parse_individual_bookpage(self, response: Response):
         book = response.css("article.product_page")
+        table_rows = book.css("table tr")
         yield{
             # why is the list in reverse order xD
             # has to have something to do with 
@@ -26,10 +27,17 @@ class BookspiderSpider(scrapy.Spider):
             # B: because of the way i call it here
             'name' : book.css("div h1::text").get(),
             'price' : book.css("div p.price_color::text").get(),
+
             'product-description' : book.xpath('//div[@id="product_description"]/following-sibling::p/text()').get(),
             'category' : book.xpath('//ul[@class = "breadcrumb"]/li[@class = "active"]/preceding-sibling::li[1]/a/text()')
             .get(),
 
-
+            'UPC': table_rows[0].css("tr td::text").get(),
+            'product-type' : table_rows[1].css("tr td::text").get(),
+            'price-without-tax' : table_rows[2].css("tr td::text").get(),
+            'price-with-tax' : table_rows[3].css("tr td::text").get(),
+            'tax' : table_rows[4].css("tr td::text").get(),
+            'availability' : table_rows[5].css("tr td::text").get(),
+            'star-rating' : book.css('p.star-rating ::attr(class)').get(),
         }
         pass
